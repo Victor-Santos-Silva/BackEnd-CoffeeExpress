@@ -14,19 +14,30 @@ const Produto = sequelize.define(
       allowNull: false,
     },
     tipoDeProduto: {
-      type: DataTypes.ENUM("Capuccino", "Expresso", "Latte", "Mocha", "Cappuccino Gelado", "Outros"),
+      type: DataTypes.ENUM(
+        "Capuccino",
+        "Expresso",
+        "Latte",
+        "Mocha",
+        "Cappuccino Gelado",
+        "Outros"
+      ),
       allowNull: false,
     },
     descricao: {
       type: DataTypes.STRING(255),
       allowNull: false,
     },
-    preco: {
+    precoPequeno: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    tamanhos: {
-      type: DataTypes.ENUM("Pequeno", "Médio", "Grande"),
+    precoMedio: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    precoGrande: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     imagem: {
