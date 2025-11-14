@@ -13,12 +13,27 @@ fs.readdirSync(__dirname)
   });
 
 // Desestrutura para facilitar o uso
-const { Pedido, Produto } = db;
+const { Carrinho, Pedido, Produto } = db;
 
 // 🔗 Registrar associações (importante fazer após carregar todos)
 if (Pedido && Produto) {
   Pedido.belongsTo(Produto, { foreignKey: "idProduto", as: "produto" });
   Produto.hasMany(Pedido, { foreignKey: "idProduto", as: "pedidos" });
+}
+
+// Associações
+if (Carrinho && Produto) {
+  Carrinho.belongsTo(Produto, {
+    foreignKey: "produtoId",
+    targetKey: "idProduto",
+    as: "produto",
+  });
+
+  Produto.hasMany(Carrinho, {
+    foreignKey: "produtoId",
+    sourceKey: "idProduto",
+    as: "itensCarrinho",
+  });
 }
 
 // Sincronizar com o banco

@@ -1,4 +1,4 @@
-const { Pedido, Produto } = require("../models");
+const { Pedido, PedidoItem, CarrinhoItem, Produto } = require("../models");
 
 const pedidoService = {
   // Criar pedido
@@ -30,6 +30,39 @@ const pedidoService = {
       console.error("Erro ao buscar pedidos:", error);
       throw new Error("Ocorreu um erro ao buscar os pedidos.");
     }
+  },
+  finalizarPedido: async (userId) => {
+    const itens = await CarrinhoItem.findAll({ where: { userId } });
+
+    if (itens.length === 0) {
+      throw new Error("Carrinho vazio.");
+    }
+
+    const pedido = await Pedido.create({
+      userId,
+      total: itens.reduce((acc, item) => acc + item.subtotal, 0),
+    });
+
+    // Criar itens do pedido
+    for (const item of itens) {
+      const produto = await Produto.findByPk(item.produtoId);
+
+      // Atualizar estoque
+      produto.estoque -= item.quantidade;
+      await produto.save();
+
+      await PedidoItem.create({
+        pedidoId: pedido.id,
+        produtoId: item.produtoId,
+        quantidade: item.quantidade,
+        precoUnitario: produto.preco,
+      });
+    }
+
+    // Limpa carrinho
+    await CarrinhoItem.destroy({ where: { userId } });
+
+    return pedido;
   },
 };
 
