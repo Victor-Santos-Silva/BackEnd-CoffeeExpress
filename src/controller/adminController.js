@@ -32,6 +32,11 @@ const adminController = {
       return res.status(200).json({
         msg: "Login realizado",
         token,
+        admin: {
+          id: admin.id,
+          nome: admin.nome,
+          email: admin.email,
+        },
       });
     } catch (error) {
       console.error(error);
