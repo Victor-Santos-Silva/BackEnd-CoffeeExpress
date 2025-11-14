@@ -4,9 +4,14 @@ const carrinhoService = require("../services/carrinhoService");
 const carrinhoController = {
   create: async (req, res) => {
     try {
-      const { adminId, produtoId, quantidade } = req.body;
+      const { adminId, produtoId, quantidade, tamanho } = req.body;
 
-      const item = await carrinhoService.create(adminId, produtoId, quantidade);
+      const item = await carrinhoService.create(
+        adminId,
+        produtoId,
+        quantidade,
+        tamanho
+      );
 
       res.status(200).json({
         mensagem: "Produto adicionado ao carrinho",
@@ -31,17 +36,23 @@ const carrinhoController = {
     }
   },
   deleteItem: async (req, res) => {
-  try {
-    const { adminId, produtoId } = req.params;
+    try {
+      const { adminId, produtoId, tamanho } = req.params;
 
-    const result = await carrinhoService.deleteItem(adminId, produtoId);
+      // opcional: log para debug
+      console.log("Delete params:", { adminId, produtoId, tamanho });
 
-    return res.status(200).json(result);
-  } catch (error) {
-    return res.status(400).json({ erro: error.message });
-  }
-},
+      const result = await carrinhoService.deleteItem(
+        Number(adminId),
+        Number(produtoId),
+        tamanho
+      );
 
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(400).json({ erro: error.message });
+    }
+  },
 };
 
 module.exports = carrinhoController;

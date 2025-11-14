@@ -2,34 +2,42 @@ const Carrinho = require("../models/Carrinho");
 const Produto = require("../models/Produto");
 
 const carrinhoService = {
-  create: async (adminId, produtoId, quantidade) => {
+  create: async (adminId, produtoId, quantidade, tamanho) => {
     const produto = await Produto.findByPk(produtoId);
+    if (!produto) throw new Error("Produto não encontrado.");
 
-    if (!produto) {
-      throw new Error("Produto não encontrado.");
+    // Define o preço com base no tamanho escolhido
+    let precoUnitario;
+    switch (tamanho) {
+      case "P":
+        precoUnitario = Number(produto.precoPequeno);
+        break;
+      case "M":
+        precoUnitario = Number(produto.precoMedio);
+        break;
+      case "G":
+        precoUnitario = Number(produto.precoGrande);
+        break;
+      default:
+        throw new Error("Tamanho inválido.");
     }
 
-    // Defina o preço que deseja usar
-    const precoUnitario = Number(produto.precoPequeno);
-
-    // Calcula total
     const precoTotal = precoUnitario * quantidade;
 
-    // Verifica se o item já existe no carrinho
+    // Busca o item pelo tamanho também
     let item = await Carrinho.findOne({
-      where: { adminId, produtoId },
+      where: { adminId, produtoId, tamanho },
     });
 
     if (item) {
-      // Atualiza quantidade e total
       item.quantidade += quantidade;
       item.precoTotal = item.quantidade * precoUnitario;
       await item.save();
     } else {
-      // Cria novo item
       item = await Carrinho.create({
         adminId,
         produtoId,
+        tamanho,
         quantidade,
         precoTotal,
       });
@@ -52,30 +60,30 @@ const carrinhoService = {
       produtoId: i.produtoId,
       nome: i.produto.nome,
       quantidade: i.quantidade,
-      precoUnitario: Number(i.produto.precoPequeno),
+      tamanho: i.tamanho,
+      precoUnitario:
+        i.tamanho === "P"
+          ? Number(i.produto.precoPequeno)
+          : i.tamanho === "M"
+          ? Number(i.produto.precoMedio)
+          : Number(i.produto.precoGrande),
       subtotal: Number(i.precoTotal),
     }));
 
     const total = items.reduce((acc, item) => acc + item.subtotal, 0);
 
-    return {
-      adminId,
-      items,
-      total,
-    };
+    return { adminId, items, total };
   },
-  deleteItem: async (adminId, produtoId) => {
+
+  deleteItem: async (adminId, produtoId, tamanho) => {
     const item = await Carrinho.findOne({
-      where: { adminId, produtoId },
+      where: { adminId, produtoId, tamanho },
     });
 
-    if (!item) {
-      throw new Error("Item não encontrado no carrinho.");
-    }
+    if (!item) throw new Error("Item não encontrado.");
 
     await item.destroy();
-
-    return { mensagem: "Item removido do carrinho." };
+    return { mensagem: "Item removido." };
   },
 };
 

@@ -21,6 +21,10 @@ const Carrinho = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    tamanho: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     precoTotal: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
