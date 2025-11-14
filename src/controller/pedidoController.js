@@ -3,14 +3,22 @@ const pedidoService = require("../services/pedidoService");
 const pedidoController = {
   create: async (req, res) => {
     try {
-      const pedido = await pedidoService.create(req.body);
+      const { adminId } = req.body; // pega do body
+      if (!adminId) {
+        return res.status(400).json({ msg: "adminId é obrigatório" });
+      }
+
+      const pedido = await pedidoService.create(adminId);
+
       return res.status(200).json({
         msg: "Pedido feito com sucesso.",
         pedido,
       });
     } catch (error) {
+      console.error("Erro ao criar pedido:", error);
       return res.status(500).json({
         msg: "Erro ao tentar criar o pedido.",
+        error: error.message,
       });
     }
   },

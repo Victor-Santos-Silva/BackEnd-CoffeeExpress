@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
-
 const sequelize = require("../config/database");
+const Produto = require("./Produto");
+const Pedido = require("./Pedido");
 
 const Carrinho = sequelize.define(
   "Carrinho",
@@ -13,8 +14,16 @@ const Carrinho = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "Produtos",
+        model: Produto,
         key: "idProduto",
+      },
+    },
+    pedidoId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      references: {
+        model: Pedido,
+        key: "idPedido",
       },
     },
     quantidade: {
@@ -34,5 +43,12 @@ const Carrinho = sequelize.define(
     timestamps: true,
   }
 );
+
+// Associações
+Carrinho.belongsTo(Produto, { foreignKey: "produtoId" });
+Produto.hasMany(Carrinho, { foreignKey: "produtoId" });
+
+Carrinho.belongsTo(Pedido, { foreignKey: "pedidoId" });
+Pedido.hasMany(Carrinho, { foreignKey: "pedidoId" });
 
 module.exports = Carrinho;
