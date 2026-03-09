@@ -1,42 +1,43 @@
-const fs = require("fs");
-const path = require("path");
-const sequelize = require("../config/database");
+'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const process = require('process');
+const basename = path.basename(__filename);
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
-// Ler todos os arquivos de modelo na pasta
-fs.readdirSync(__dirname)
-  .filter((file) => file !== "index.js")
-  .forEach((file) => {
-    const model = require(path.join(__dirname, file));
+let sequelize;
+if (config.use_env_variable) {
+  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else {
+  sequelize = new Sequelize(config.database, config.username, config.password, config);
+}
+
+fs
+  .readdirSync(__dirname)
+  .filter(file => {
+    return (
+      file.indexOf('.') !== 0 &&
+      file !== basename &&
+      file.slice(-3) === '.js' &&
+      file.indexOf('.test.js') === -1
+    );
+  })
+  .forEach(file => {
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
     db[model.name] = model;
   });
 
-// Desestrutura para facilitar o uso
-const { Carrinho, Pedido, Produto } = db;
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
-// 🔗 Registrar associações (importante fazer após carregar todos)
-if (Pedido && Produto) {
-  Pedido.belongsTo(Produto, { foreignKey: "idProduto", as: "produto" });
-  Produto.hasMany(Pedido, { foreignKey: "idProduto", as: "pedidos" });
-}
+db.sequelize = sequelize;
+db.Sequelize = Sequelize;
 
-// Associações
-if (Carrinho && Produto) {
-  Carrinho.belongsTo(Produto, {
-    foreignKey: "produtoId",
-    targetKey: "idProduto",
-    as: "produto",
-  });
-
-  Produto.hasMany(Carrinho, {
-    foreignKey: "produtoId",
-    sourceKey: "idProduto",
-    as: "itensCarrinho",
-  });
-}
-
-// Sincronizar com o banco
-sequelize.sync();
-
-module.exports = { sequelize, ...db };
+module.exports = db;

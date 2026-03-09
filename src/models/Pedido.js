@@ -1,9 +1,5 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-
-const Pedido = sequelize.define(
-  "Pedido",
-  {
+module.exports = (sequelize, DataTypes) => {
+  const Pedido = sequelize.define("Pedido", {
     idPedido: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -13,7 +9,7 @@ const Pedido = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: "Carrinhos",
+        model: "carrinho",
         key: "id",
       },
     },
@@ -21,10 +17,10 @@ const Pedido = sequelize.define(
       type: DataTypes.ENUM("PENDENTE", "ENVIADO", "ENTREGUE", "CANCELADO"),
       allowNull: false,
     },
-  },
-  {
-    timestamps: true,
-  }
-);
+  });
+  Pedido.associate = (models) => {
+    Pedido.hasMany(models.Carrinho, { foreignKey: "pedidoId" });
+  };
 
-module.exports = Pedido;
+  return Pedido;
+};
