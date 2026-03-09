@@ -10,7 +10,6 @@ const produtoService = {
         precoPequeno,
         precoMedio,
         precoGrande,
-        imagem,
       } = produto;
       return await Produto.create({
         nome,
@@ -19,7 +18,6 @@ const produtoService = {
         precoPequeno,
         precoMedio,
         precoGrande,
-        imagem,
       });
     } catch (error) {
       console.log(error);

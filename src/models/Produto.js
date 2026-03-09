@@ -20,7 +20,7 @@ const Produto = sequelize.define(
         "Latte",
         "Mocha",
         "Cappuccino Gelado",
-        "Outros"
+        "Outros",
       ),
       allowNull: false,
     },
@@ -40,14 +40,10 @@ const Produto = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
-    imagem: {
-      type: DataTypes.STRING, // armazena o caminho ou URL
-      allowNull: true,
-    },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 module.exports = Produto;

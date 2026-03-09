@@ -7,7 +7,6 @@ const routes = require("./router/router");
 
 app.use(express.json()); // Resposta via JSON
 app.use("/api", routes);
-app.use("/uploads", express.static(path.join(__dirname, "config", "uploads")));
 
 sequelize
   .authenticate()

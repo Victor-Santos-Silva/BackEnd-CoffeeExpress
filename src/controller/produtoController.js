@@ -3,15 +3,7 @@ const produtoService = require("../services/produtoService.js");
 const produtoController = {
   create: async (req, res) => {
     try {
-      // Se estiver usando multer:
-
-      const imagem = req.file ? req.file.filename : null;
-
-      // Junta req.body com o nome do arquivo
-
-      const produtoData = { ...req.body, imagem };
-
-      const produto = await produtoService.create(produtoData);
+      const produto = await produtoService.create(req.body);
 
       return res.status(201).json({
         msg: "Produto criado com sucesso.",
